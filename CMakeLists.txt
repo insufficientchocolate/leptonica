@@ -23,14 +23,16 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     )
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_SOURCE_DIR}/cmake")
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.18.65.tar.gz"
+    SHA1 "59cd3223f10ee630bc3596709a22f2fea4926a7c"
+)
+
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
-
-# Use solution folders.
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake Targets")
 
 ###############################################################################
 #
@@ -41,20 +43,43 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake Targets")
 project(leptonica C CXX)
 
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 73)
-set(VERSION_PLAIN ${VERSION_MAJOR}.${VERSION_MINOR})
+set(VERSION_MINOR 74)
+set(VERSION_PATCH 2)
+set(VERSION_PLAIN ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
-find_package(GIF)
-find_package(JPEG)
-find_package(PNG)
-find_package(TIFF)
-find_package(ZLIB)
+option(BUILD_PROG "Build utility programs" OFF)
 
-find_package(PkgConfig)
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.cppan)
+    find_package(GIF)
+    hunter_add_package(Jpeg)
+    find_package(JPEG CONFIG REQUIRED)
+    hunter_add_package(PNG)
+    find_package(PNG CONFIG REQUIRED)
+    hunter_add_package(TIFF)
+    find_package(TIFF CONFIG REQUIRED)
+    hunter_add_package(ZLIB)
+    find_package(ZLIB CONFIG REQUIRED)
 
-if (PKG_CONFIG_FOUND)
-pkg_check_modules(WEBP libwebp)
-pkg_check_modules(JP2K libopenjp2)
+    find_package(PkgConfig)
+
+    if (PKG_CONFIG_FOUND)
+    pkg_check_modules(WEBP libwebp)
+    pkg_check_modules(JP2K libopenjp2)
+    endif()
+else()
+    add_subdirectory(.cppan)
+
+    add_definitions(
+        -DHAVE_LIBGIF=1
+        -DHAVE_LIBJPEG=1
+        -DHAVE_LIBPNG=1
+        -DHAVE_LIBTIFF=1
+        -DHAVE_LIBWEBP=1
+        -DHAVE_LIBZ=1
+
+        -DHAVE_LIBJP2K=1
+        -DLIBJP2K_HEADER="openjpeg.h"
+    )
 endif()
 
 ###############################################################################
@@ -70,26 +95,10 @@ endif()
 
 if (WIN32)
     if (MSVC)
+        add_definitions(-D_CRT_SECURE_NO_WARNINGS)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W1")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     endif()
-endif()
-
-if(EXISTS ${PROJECT_SOURCE_DIR}/cppan)
-    # cppan settings
-    add_definitions(-DTIF_PLATFORM_CONSOLE=1)
-
-    add_subdirectory(cppan)
-
-    # leptonica settings
-    add_definitions(
-        -DHAVE_LIBGIF=1
-        -DHAVE_LIBJPEG=1
-        -DHAVE_LIBPNG=1
-        -DHAVE_LIBTIFF=1
-        -DHAVE_LIBWEBP=1
-        -DHAVE_LIBZ=1
-    )
 endif()
 
 ###############################################################################
@@ -98,20 +107,20 @@ endif()
 #
 ###############################################################################
 
-set(AUTOCONFIG_SRC ${CMAKE_BINARY_DIR}/config_auto.h.in)
-set(AUTOCONFIG ${CMAKE_BINARY_DIR}/src/config_auto.h)
+set(AUTOCONFIG_SRC ${CMAKE_CURRENT_BINARY_DIR}/config_auto.h.in)
+set(AUTOCONFIG ${CMAKE_CURRENT_BINARY_DIR}/src/config_auto.h)
 
 include(Configure)
 
 configure_file(${AUTOCONFIG_SRC} ${AUTOCONFIG} @ONLY)
 
-set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src)
+set(INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include" "${CMAKE_INSTALL_PREFIX}/include/leptonica")
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/templates/LeptonicaConfig-version.cmake.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/LeptonicaConfig-version.cmake.in
     ${CMAKE_BINARY_DIR}/LeptonicaConfig-version.cmake @ONLY)
 configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/templates/LeptonicaConfig.cmake.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/LeptonicaConfig.cmake.in
     ${CMAKE_BINARY_DIR}/LeptonicaConfig.cmake @ONLY)
 
 ###############################################################################
@@ -130,5 +139,15 @@ add_subdirectory(prog)
 endif()
 
 add_subdirectory(src)
+
+get_target_property(leptonica_NAME leptonica NAME)
+get_target_property(leptonica_VERSION leptonica VERSION)
+get_target_property(leptonica_OUTPUT_NAME leptonica OUTPUT_NAME)
+configure_file(lept.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/lept.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lept.pc DESTINATION lib/pkgconfig)
+install(FILES
+    ${CMAKE_BINARY_DIR}/LeptonicaConfig.cmake
+    ${CMAKE_BINARY_DIR}/LeptonicaConfig-version.cmake
+    DESTINATION cmake)
 
 ###############################################################################
