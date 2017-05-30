@@ -23,14 +23,16 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     )
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_SOURCE_DIR}/cmake")
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.18.65.tar.gz"
+    SHA1 "59cd3223f10ee630bc3596709a22f2fea4926a7c"
+)
+
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
-
-# Use solution folders.
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake Targets")
 
 ###############################################################################
 #
@@ -49,10 +51,14 @@ option(BUILD_PROG "Build utility programs" OFF)
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.cppan)
     find_package(GIF)
-    find_package(JPEG)
-    find_package(PNG)
-    find_package(TIFF)
-    find_package(ZLIB)
+    hunter_add_package(Jpeg)
+    find_package(JPEG CONFIG REQUIRED)
+    hunter_add_package(PNG)
+    find_package(PNG CONFIG REQUIRED)
+    hunter_add_package(TIFF)
+    find_package(TIFF CONFIG REQUIRED)
+    hunter_add_package(ZLIB)
+    find_package(ZLIB CONFIG REQUIRED)
 
     find_package(PkgConfig)
 
@@ -101,8 +107,8 @@ endif()
 #
 ###############################################################################
 
-set(AUTOCONFIG_SRC ${CMAKE_BINARY_DIR}/config_auto.h.in)
-set(AUTOCONFIG ${CMAKE_BINARY_DIR}/src/config_auto.h)
+set(AUTOCONFIG_SRC ${CMAKE_CURRENT_BINARY_DIR}/config_auto.h.in)
+set(AUTOCONFIG ${CMAKE_CURRENT_BINARY_DIR}/src/config_auto.h)
 
 include(Configure)
 
@@ -111,10 +117,10 @@ configure_file(${AUTOCONFIG_SRC} ${AUTOCONFIG} @ONLY)
 set(INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include" "${CMAKE_INSTALL_PREFIX}/include/leptonica")
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/templates/LeptonicaConfig-version.cmake.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/LeptonicaConfig-version.cmake.in
     ${CMAKE_BINARY_DIR}/LeptonicaConfig-version.cmake @ONLY)
 configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/templates/LeptonicaConfig.cmake.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/LeptonicaConfig.cmake.in
     ${CMAKE_BINARY_DIR}/LeptonicaConfig.cmake @ONLY)
 
 ###############################################################################
