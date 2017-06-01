@@ -53,7 +53,7 @@ if (UNIX)
 endif()
 
 if (NOT CPPAN_BUILD)
-    export(TARGETS leptonica FILE ${CMAKE_BINARY_DIR}/LeptonicaTargets.cmake)
+#    export(TARGETS leptonica FILE ${CMAKE_BINARY_DIR}/LeptonicaTargets.cmake)
 else()
     target_link_libraries       (leptonica
         pvt.cppan.demo.gif
@@ -67,8 +67,8 @@ else()
     export(TARGETS leptonica APPEND FILE ${CMAKE_BINARY_DIR}/LeptonicaTargets.cmake)
 endif()
 
-install(TARGETS leptonica EXPORT LeptonicaTargets RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
-install(EXPORT LeptonicaTargets DESTINATION cmake)
+install(TARGETS leptonica EXPORT LeptonicaTargets RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib INCLUDES DESTINATION include)
+install(EXPORT LeptonicaTargets DESTINATION lib/cmake/${PROJECT_NAME})
 install(FILES
     ${hdr}
     ${CMAKE_BINARY_DIR}/src/endianness.h
