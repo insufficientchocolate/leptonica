@@ -57,7 +57,7 @@ else()
 endif()
 
 install(TARGETS leptonica EXPORT LeptonicaTargets RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib INCLUDES DESTINATION include)
-install(EXPORT LeptonicaTargets DESTINATION lib/cmake/${PROJECT_NAME})
+install(EXPORT LeptonicaTargets NAMESPACE "Leptonica::" DESTINATION lib/cmake/${PROJECT_NAME})
 install(FILES
     ${hdr}
     ${CMAKE_BINARY_DIR}/src/endianness.h
