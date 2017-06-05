@@ -14,7 +14,7 @@ if (MSVC)
     set_source_files_properties(${src} PROPERTIES LANGUAGE CXX)
 endif()
 
-add_library                     (leptonica ${LIBRARY_TYPE} ${src} ${hdr})
+add_library                     (leptonica ${src} ${hdr})
 set_target_properties           (leptonica PROPERTIES VERSION   ${VERSION_PLAIN})
 set_target_properties           (leptonica PROPERTIES SOVERSION 5.1.0)
 if (WIN32)
