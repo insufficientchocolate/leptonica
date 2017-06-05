@@ -35,7 +35,7 @@ endif()
 if (WEBP_FOUND)
     target_link_libraries       (leptonica ${WEBP_LIBRARIES})
 endif()
-target_link_libraries           (leptonica JPEG::jpeg PNG::png TIFF::libtiff ZLIB::zlib)
+target_link_libraries           (leptonica PUBLIC JPEG::jpeg PNG::png TIFF::libtiff ZLIB::zlib)
 
 if (UNIX)
     target_link_libraries       (leptonica m)
