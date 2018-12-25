@@ -30,20 +30,16 @@ endif()
 if (NOT STATIC)
     target_compile_definitions  (leptonica PRIVATE -DLIBLEPT_EXPORTS)
 endif()
-
-if (GIF_LIBRARY)
-    target_include_directories  (leptonica PUBLIC ${GIF_INCLUDE_DIR})
-    target_link_libraries       (leptonica ${GIF_LIBRARY})
-endif()
-if (JP2K_FOUND)
-    target_include_directories  (leptonica PUBLIC ${JP2K_INCLUDE_DIRS})
-    target_link_libraries       (leptonica ${JP2K_LIBRARIES})
-endif()
-if (WEBP_FOUND)
-    target_include_directories  (leptonica PUBLIC ${WEBP_INCLUDE_DIRS})
-    target_link_libraries       (leptonica ${WEBP_LIBRARIES})
-endif()
-target_link_libraries           (leptonica PUBLIC JPEG::jpeg PNG::png TIFF::libtiff ZLIB::zlib)
+target_link_libraries(
+    leptonica
+    PUBLIC
+    PNG::png
+    TIFF::libtiff
+    ZLIB::zlib
+    giflib::giflib
+    ${MOZJPEG_LIBRARIES}
+    WebP::webp
+)
 
 if (UNIX)
     target_link_libraries       (leptonica m)

@@ -25,8 +25,8 @@ endif()
 
 include("cmake/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.18.65.tar.gz"
-    SHA1 "59cd3223f10ee630bc3596709a22f2fea4926a7c"
+    URL "https://github.com/ruslo/hunter/archive/v0.23.83.tar.gz"
+    SHA1 "12dec078717539eb7b03e6d2a17797cba9be9ba9"
 )
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -50,22 +50,18 @@ set(VERSION_PLAIN ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 option(BUILD_PROG "Build utility programs" OFF)
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.cppan)
-    find_package(GIF)
-    hunter_add_package(Jpeg)
-    find_package(JPEG CONFIG REQUIRED)
+    hunter_add_package(giflib)
+    find_package(giflib CONFIG REQUIRED)
+    hunter_add_package(mozjpeg)
+    find_package(mozjpeg CONFIG REQUIRED)
     hunter_add_package(PNG)
     find_package(PNG CONFIG REQUIRED)
     hunter_add_package(TIFF)
     find_package(TIFF CONFIG REQUIRED)
     hunter_add_package(ZLIB)
     find_package(ZLIB CONFIG REQUIRED)
-
-    find_package(PkgConfig)
-
-    if (PKG_CONFIG_FOUND)
-    pkg_check_modules(WEBP libwebp)
-    pkg_check_modules(JP2K libopenjp2)
-    endif()
+    hunter_add_package(WebP)
+    find_package(WebP CONFIG REQUIRED)
 else()
     add_subdirectory(.cppan)
 

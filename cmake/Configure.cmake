@@ -95,7 +95,7 @@ if (GIF_FOUND)
     set(HAVE_LIBGIF 1)
 endif()
 
-if (JPEG_FOUND)
+if (JPEG_FOUND OR mozjpeg_FOUND)
     set(HAVE_LIBJPEG 1)
 endif()
 
@@ -110,8 +110,7 @@ endif()
 if (TIFF_FOUND)
     set(HAVE_LIBTIFF 1)
 endif()
-
-if (WEBP_FOUND)
+if (WEBP_FOUND OR WebP_FOUND)
     set(HAVE_LIBWEBP 1)
 endif()
 
