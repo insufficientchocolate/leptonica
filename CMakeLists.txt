@@ -23,14 +23,16 @@ if ("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}")
     )
 endif()
 
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.18.65.tar.gz"
+    SHA1 "59cd3223f10ee630bc3596709a22f2fea4926a7c"
+)
+
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
-
-# Use solution folders.
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake Targets")
 
 ###############################################################################
 #
@@ -49,10 +51,14 @@ option(BUILD_PROG "Build utility programs" OFF)
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/.cppan)
     find_package(GIF)
-    find_package(JPEG)
-    find_package(PNG)
-    find_package(TIFF)
-    find_package(ZLIB)
+    hunter_add_package(Jpeg)
+    find_package(JPEG CONFIG REQUIRED)
+    hunter_add_package(PNG)
+    find_package(PNG CONFIG REQUIRED)
+    hunter_add_package(TIFF)
+    find_package(TIFF CONFIG REQUIRED)
+    hunter_add_package(ZLIB)
+    find_package(ZLIB CONFIG REQUIRED)
 
     find_package(PkgConfig)
 
@@ -81,11 +87,6 @@ endif()
 # compiler and linker
 #
 ###############################################################################
-
-set(LIBRARY_TYPE SHARED)
-if (STATIC)
-    set(LIBRARY_TYPE)
-endif()
 
 if (WIN32)
     if (MSVC)
@@ -142,6 +143,6 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lept.pc DESTINATION lib/pkgconfig)
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/LeptonicaConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/LeptonicaConfig-version.cmake
-    DESTINATION cmake)
+    DESTINATION lib/cmake/${PROJECT_NAME})
 
 ###############################################################################
