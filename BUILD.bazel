@@ -1,0 +1,56 @@
+load("@mozjpeg//bazel:cmake.bzl", "cmake_config")
+
+cmake_config(
+    name = "config_auto",
+    src = "bazel/config_auto.h.in",
+    out = "config_auto.h",
+    variables = {
+        "HAVE_DLFCN_H": "1",
+        "HAVE_INTTYPES_H": "1",
+        "HAVE_MEMORY_H": "1",
+        "HAVE_STDINT_H": "1",
+        "HAVE_STDLIB_H": "1",
+        "HAVE_STRINGS_H": "1",
+        "HAVE_STRING_H": "1",
+        "HAVE_SYS_STAT_H": "1",
+        "HAVE_SYS_TYPES_H": "1",
+        "HAVE_UNISTD_H": "1",
+        "HAVE_OPENJPEG_2_0_OPENJPEG_H": "0",
+        "HAVE_OPENJPEG_2_1_OPENJPEG_H": "0",
+        "HAVE_OPENJPEG_2_2_OPENJPEG_H": "0",
+        "HAVE_FMEMOPEN": "1",
+        "HAVE_LIBGIF": "0",
+        "HAVE_LIBJP2K": "0",
+        "HAVE_LIBJPEG": "1",
+        "HAVE_LIBPNG": "0",
+        "HAVE_LIBTIFF": "0",
+        "HAVE_LIBWEBP": "1",
+        "HAVE_LIBZ": "1",
+    },
+)
+
+cmake_config(
+    name = "endianness_header",
+    src = "src/endianness.h.in",
+    out = "endianness.h",
+    variables = {
+        "APPLE_UNIVERSAL_BUILD": "defined(__APPLE_CC)",
+        "ENDIANNESS": "L_LITTLE_ENDIAN",
+    },
+)
+
+cc_library(
+    name = "leptonica",
+    srcs = glob([
+        "src/*.c",
+        "src/*.h",
+    ]) + [
+        ":config_auto",
+        ":endianness_header",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@mozjpeg",
+        "@webp",
+    ],
+)
